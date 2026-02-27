@@ -5,14 +5,40 @@
     height: auto;
     gap: 4px;
     width: 100%;
-    
+
+    &:not(.reply).group-both .text {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    &:not(.reply).group-prev .text {
+        border-top-right-radius: 5px;
+    }
+
+    &:not(.reply).group-next .text {
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 5px;
+    }
+
+    &:not(.group-prev):not(.group-both) {
+        margin-top: 16px;
+    }
+
     &.reply {
         align-items: flex-start;
 
-        .text {
-            background-color: rgb(0, 75, 166);
-            border-top-right-radius: 16px;
-            border-top-left-radius: 0;
+        &.group-both .text {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        &.group-prev .text {
+            border-top-left-radius: 5px;
+        }
+
+        &.group-next .text {
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 5px;
         }
     }
 
@@ -24,9 +50,9 @@
     .text {
         background-color: rgb(0, 105, 216);
         padding: 10px 12px;
-        border-radius: 16px;
-        border-top-right-radius: 0;
+        border-radius: 20px;
         width: fit-content;
+        max-width: 75%;
         overflow-wrap: anywhere;
         word-break: break-word;
         white-space: pre-wrap;

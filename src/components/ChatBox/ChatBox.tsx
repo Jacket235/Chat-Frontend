@@ -94,18 +94,25 @@ export default function ChatBox() {
         <div className="chat-box">
             <div className='chat-box-container' ref={messagesRef}>
                 {!connected && <Button label='Dołącz' onClick={handleConnect} />}
-                {timeline.map((item) =>
-                    item.kind === "event" ? (
-                        <p key={item.id} className="system-message">{item.text}</p>
-                    ) : (
+                {timeline.map((item, i) => {
+                    if (item.kind === "event") return <p key={item.id} className="system-message">{item.text}</p>
+
+                    const prev = timeline[i - 1]
+                    const next = timeline[i + 1]
+                    const isGroupedWithPrevious = prev?.kind === "message" && prev.clientID === item.clientID
+                    const isGroupedWithNext = next?.kind === "message" && next.clientID === item.clientID
+
+                    return(
                         <Message
                             key={item.id}
                             username={item.clientID}
                             text={item.text}
                             reply={item.clientID !== clientID}
+                            groupPrev={isGroupedWithPrevious}
+                            groupNext={isGroupedWithNext}
                         />
                     )
-                )}
+                })}
             </div>
             <div className='chat-box-actions'>
                 <InputTextField 
