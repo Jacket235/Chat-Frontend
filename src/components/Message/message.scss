@@ -5,10 +5,14 @@
 
     &.reply {
         justify-content: unset;
+
+        .text {
+            background-color: rgb(0, 75, 166);
+        }
     }
 
     .text {
-        background-color: #004bc4;
+        background-color: rgb(0, 105, 216);
         padding: 10px 12px;
         border-radius: 16px;
         max-width: 50%;
