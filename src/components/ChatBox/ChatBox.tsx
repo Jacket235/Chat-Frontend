@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Button from '../Button/Button'
 import { fetchAPI } from '../../utils/fetchAPI'
+import InputTextField from '../InputTextField/InputTextField'
+import SendIcon from '/src/assets/send.svg?react'
 import './chat-box.scss'
-
 
 export default function ChatBox() {
     const [connected, setConnected] = useState<boolean>(false)
@@ -42,6 +43,12 @@ export default function ChatBox() {
         <div className="chat-box">
             <div className='chat-box-container'>
                 <Button label='Dołącz' onClick={handleConnect} disabled={connected}/>
+            </div>
+            <div className='chat-box-actions'>
+                <InputTextField />
+                <button type="button">
+                    <SendIcon />
+                </button>
             </div>
         </div>
     )
