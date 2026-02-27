@@ -8,11 +8,12 @@ import './chat-box.scss'
 
 type TimelineItem =
     | { id: string; kind: "event"; text: string }
-    | { id: string; kind: "message"; text: string; clientID: string }
+    | { id: string; kind: "message"; text: string; clientID: string; username: string }
 
 export default function ChatBox() {
     const [connected, setConnected] = useState<boolean>(false)
     const [clientID, setClientID] = useState<string | null>(null)
+    const [username, setUsername] = useState<string>("")
     const wsRef = useRef<WebSocket | null>(null)
 
     const [timeline, setTimeline] = useState<TimelineItem[]>([])
@@ -59,7 +60,7 @@ export default function ChatBox() {
             if (data.type === 'chat_message') {
                 setTimeline(prev => [
                     ...prev,
-                    { id: Date.now().toString(), kind: "message", text: data.text, clientID: data.clientID },
+                    { id: Date.now().toString(), kind: "message", text: data.text, clientID: data.clientID, username: data.username },
                 ])
             }
         })
@@ -93,7 +94,16 @@ export default function ChatBox() {
     return(
         <div className="chat-box">
             <div className='chat-box-container' ref={messagesRef}>
-                {!connected && <Button label='Dołącz' onClick={handleConnect} />}
+                {!connected && (
+                    <>
+                        <InputTextField 
+                            placeholder='Nazwa' 
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                        />
+                        <Button label='Dołącz' onClick={handleConnect} />
+                    </>
+                )}
                 {timeline.map((item, i) => {
                     if (item.kind === "event") return <p key={item.id} className="system-message">{item.text}</p>
 
@@ -105,7 +115,7 @@ export default function ChatBox() {
                     return(
                         <Message
                             key={item.id}
-                            username={item.clientID}
+                            username={item.username ?? item.clientID}
                             text={item.text}
                             reply={item.clientID !== clientID}
                             groupPrev={isGroupedWithPrevious}
