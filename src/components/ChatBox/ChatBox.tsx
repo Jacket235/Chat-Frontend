@@ -12,7 +12,7 @@ export default function ChatBox() {
     const wsRef = useRef<WebSocket | null>(null)
 
     const [events, setEvents] = useState<string[]>([])
-    const [messages, setMessages] = useState<string[]>([])
+    const [messages, setMessages] = useState<Array<{ text: string; clientID: string }>>([])
     const [draft, setDraft] = useState<string>("")
 
     const handleConnect = async () => {
@@ -39,7 +39,7 @@ export default function ChatBox() {
             }
 
             if (data.type === 'chat_message') {
-                console.log("Someone tried to send a message")
+                setMessages(prev => [...prev, { text: data.text, clientID: data.clientID }])
             }
         })
 
@@ -54,6 +54,15 @@ export default function ChatBox() {
         return () => wsRef.current?.close()
     }, [])
 
+    const handleSendMessage = () => {
+        const ws = wsRef.current
+        const text = draft.trim()
+        if (!ws || !text) return
+
+        ws.send(JSON.stringify({ type: "chat_message", text }))
+        setDraft("")
+    }
+
     return(
         <div className="chat-box">
             <div className='chat-box-container'>
@@ -64,7 +73,7 @@ export default function ChatBox() {
                     </p>
                 ))}
                 {messages.map((msg, i) => (
-                    <Message key={i} text={msg} reply={false}/>
+                    <Message key={i} text={msg.text} reply={msg.clientID !== clientID}/>
                 ))}
             </div>
             <div className='chat-box-actions'>
@@ -73,8 +82,11 @@ export default function ChatBox() {
                     value={draft}
                     placeholder='Aa'
                     onChange={e => setDraft(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key === "Enter")  handleSendMessage()
+                    }}
                 />
-                <button type="button">
+                <button type="button" onClick={handleSendMessage}>
                     <SendIcon />
                 </button>
             </div>
