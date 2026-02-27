@@ -1,0 +1,19 @@
+.message-container {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 40px;
+
+    &.reply {
+        justify-content: unset;
+    }
+
+    .text {
+        background-color: #004bc4;
+        padding: 10px 12px;
+        border-radius: 16px;
+        max-width: 50%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+}
