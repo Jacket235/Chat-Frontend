@@ -1,5 +1,5 @@
 export async function fetchAPI(path: string, options: RequestInit = {}) {
-    const res = await fetch(`http://localhost:3000/${path}`, {
+    const res = await fetch(`http://localhost:3000/${path}`, { // http://192.168.10.64:3000/
         ...options,
         credentials: "include",
         headers: {

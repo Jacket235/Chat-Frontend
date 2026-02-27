@@ -6,14 +6,19 @@ import SendIcon from '/src/assets/send.svg?react'
 import Message from '../Message/Message'
 import './chat-box.scss'
 
+type TimelineItem =
+    | { id: string; kind: "event"; text: string }
+    | { id: string; kind: "message"; text: string; clientID: string }
+
 export default function ChatBox() {
     const [connected, setConnected] = useState<boolean>(false)
     const [clientID, setClientID] = useState<string | null>(null)
     const wsRef = useRef<WebSocket | null>(null)
 
-    const [events, setEvents] = useState<string[]>([])
-    const [messages, setMessages] = useState<Array<{ text: string; clientID: string }>>([])
+    const [timeline, setTimeline] = useState<TimelineItem[]>([])
     const [draft, setDraft] = useState<string>("")
+
+    const messagesRef = useRef<HTMLDivElement | null>(null)
 
     const handleConnect = async () => {
         if (wsRef.current) return
@@ -29,17 +34,33 @@ export default function ChatBox() {
         ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data as string)
 
-            if (data.type === 'connected') {
+            if (data.type === "connected") {
                 setClientID(data.clientID)
-                setEvents(prev => [`Dołączyłeś jako ${data.clientID}`, ...prev])
+                setTimeline(prev => [
+                    ...prev,
+                    { id: crypto.randomUUID(), kind: "event", text: `Dołączyłeś jako ${data.clientID}` },
+                ])
             }
 
-            if (data.type === 'user_joined') {
-                setEvents(prev => [ ...prev, `${data.clientID} dołączył do rozmowy`])
+            if (data.type === "user_left") {
+                setTimeline(prev => [
+                    ...prev,
+                    { id: crypto.randomUUID(), kind: "event", text: `${data.clientID} wyszedł` },
+                ])
+            }
+
+            if (data.type === "user_joined") {
+                setTimeline(prev => [
+                    ...prev,
+                    { id: crypto.randomUUID(), kind: "event", text: `${data.clientID} dołączył do rozmowy` },
+                ])
             }
 
             if (data.type === 'chat_message') {
-                setMessages(prev => [...prev, { text: data.text, clientID: data.clientID }])
+                setTimeline(prev => [
+                    ...prev,
+                    { id: crypto.randomUUID(), kind: "message", text: data.text, clientID: data.clientID },
+                ])
             }
         })
 
@@ -54,6 +75,12 @@ export default function ChatBox() {
         return () => wsRef.current?.close()
     }, [])
 
+    useEffect(() => {
+        const el = messagesRef.current
+        if (!el) return
+        el.scrollTop = el.scrollHeight
+    }, [timeline])
+
     const handleSendMessage = () => {
         const ws = wsRef.current
         const text = draft.trim()
@@ -65,16 +92,19 @@ export default function ChatBox() {
 
     return(
         <div className="chat-box">
-            <div className='chat-box-container'>
+            <div className='chat-box-container' ref={messagesRef}>
                 {!connected && <Button label='Dołącz' onClick={handleConnect} />}
-                {events.map((e, i) => (
-                    <p key={`${e}-${i}`} className='system-message'>
-                        {e}
-                    </p>
-                ))}
-                {messages.map((msg, i) => (
-                    <Message key={i} text={msg.text} reply={msg.clientID !== clientID}/>
-                ))}
+                {timeline.map((item) =>
+                    item.kind === "event" ? (
+                        <p key={item.id} className="system-message">{item.text}</p>
+                    ) : (
+                        <Message
+                            key={item.id}
+                            text={item.text}
+                            reply={item.clientID !== clientID}
+                        />
+                    )
+                )}
             </div>
             <div className='chat-box-actions'>
                 <InputTextField 
