@@ -100,6 +100,7 @@ export default function ChatBox() {
                     ) : (
                         <Message
                             key={item.id}
+                            username={item.clientID}
                             text={item.text}
                             reply={item.clientID !== clientID}
                         />
