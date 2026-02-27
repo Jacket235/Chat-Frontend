@@ -1,6 +1,6 @@
 import './message.scss'
 
-export default function Message({ text, reply }: { text: string, reply?: boolean }) {
+export default function Message({ text, reply }: { text?: string, reply?: boolean }) {
     return(
         <div className={`message-container${reply ? " reply" : ""}`}>
             <span className='text'>

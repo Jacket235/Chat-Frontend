@@ -5,6 +5,11 @@
     padding: 12px;
     width: 100%;
 
+    &:has(input:disabled) {
+        cursor: unset;
+        opacity: .5;
+    }
+
     input {
         background: none;
         border: none;
