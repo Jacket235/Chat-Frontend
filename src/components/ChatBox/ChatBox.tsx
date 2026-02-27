@@ -38,28 +38,28 @@ export default function ChatBox() {
                 setClientID(data.clientID)
                 setTimeline(prev => [
                     ...prev,
-                    { id: crypto.randomUUID(), kind: "event", text: `Dołączyłeś jako ${data.clientID}` },
+                    { id: Date.now().toString(), kind: "event", text: `Dołączyłeś jako ${data.clientID}` },
                 ])
             }
 
             if (data.type === "user_left") {
                 setTimeline(prev => [
                     ...prev,
-                    { id: crypto.randomUUID(), kind: "event", text: `${data.clientID} wyszedł` },
+                    { id: Date.now().toString(), kind: "event", text: `${data.clientID} wyszedł` },
                 ])
             }
 
             if (data.type === "user_joined") {
                 setTimeline(prev => [
                     ...prev,
-                    { id: crypto.randomUUID(), kind: "event", text: `${data.clientID} dołączył do rozmowy` },
+                    { id: Date.now().toString(), kind: "event", text: `${data.clientID} dołączył do rozmowy` },
                 ])
             }
 
             if (data.type === 'chat_message') {
                 setTimeline(prev => [
                     ...prev,
-                    { id: crypto.randomUUID(), kind: "message", text: data.text, clientID: data.clientID },
+                    { id: Date.now().toString(), kind: "message", text: data.text, clientID: data.clientID },
                 ])
             }
         })
