@@ -24,8 +24,12 @@ export default function ChatBox() {
     const handleConnect = async () => {
         if (wsRef.current) return
 
+        const name = username.trim()
+
         const res = await fetchAPI("ws/config")
-        const ws = new WebSocket(res.wsUrl)
+        const ws = new WebSocket(
+            `${res.wsUrl}?username=${encodeURIComponent(name)}`
+        )
 
         ws.addEventListener('open', () => {
             wsRef.current = ws
@@ -39,21 +43,21 @@ export default function ChatBox() {
                 setClientID(data.clientID)
                 setTimeline(prev => [
                     ...prev,
-                    { id: Date.now().toString(), kind: "event", text: `Dołączyłeś jako ${data.clientID}` },
+                    { id: Date.now().toString(), kind: "event", text: `Dołączyłeś jako ${data.username}` },
                 ])
             }
 
             if (data.type === "user_left") {
                 setTimeline(prev => [
                     ...prev,
-                    { id: Date.now().toString(), kind: "event", text: `${data.clientID} wyszedł` },
+                    { id: Date.now().toString(), kind: "event", text: `${data.username} wyszedł` },
                 ])
             }
 
             if (data.type === "user_joined") {
                 setTimeline(prev => [
                     ...prev,
-                    { id: Date.now().toString(), kind: "event", text: `${data.clientID} dołączył do rozmowy` },
+                    { id: Date.now().toString(), kind: "event", text: `${data.username} dołączył do rozmowy` },
                 ])
             }
 
